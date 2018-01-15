@@ -99,6 +99,8 @@ while True:
 						bdist = ml.distance_squared_to(blueprintLocation)
 						if bdist>2:
 							fuzzygoto(unit,blueprintLocation)
+				if gc.is_move_ready(unit.id) and gc.can_move(unit.id, d):
+					gc.move_robot(unit.id, d)
 
 			if unit.unit_type == bc.UnitType.Factory:
 				garrison = unit.structure_garrison()
@@ -116,12 +118,15 @@ while True:
 
 			if unit.unit_type == bc.UnitType.Knight:
 				if unit.location.is_on_map():#can't move from inside a factory
-					if gc.is_move_ready(unit.id) and gc.can_move(unit.id, d):
-						gc.move_robot(unit.id, d)
-					inRangeUnits = gc.sense_nearby_units(unit.location.map_location(), 2)
+					inRangeUnits = gc.sense_nearby_units(unit.location.map_location(), 10)
 					for other in inRangeUnits:
 						if other.team != my_team and gc.is_attack_ready(unit.id) and gc.can_attack(unit.id, other.id):
 							gc.attack(unit.id, other.id)
+						if other.team != my_team and gc.is_move_ready(unit.id):
+							el = other.location.map_location()
+							fuzzygoto(unit.id, el)
+					if gc.is_move_ready(unit.id) and gc.can_move(unit.id, d):
+						gc.move_robot(unit.id, d)
 
 			if unit.unit_type == bc.UnitType.Ranger:
 				if unit.location.is_on_map():
